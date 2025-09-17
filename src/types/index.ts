@@ -8,10 +8,10 @@ export interface IApi {
 export interface IProduct {
 id: string;
 title: string;
-image: string;
-category: string;
+image?: string;
+category?: string;
 price: number | null;
-description: string;
+description?: string;
 }
 
 export interface IBuyer {
@@ -21,3 +21,5 @@ export interface IBuyer {
   address: string;
 }
 
+export type TPayment = 'cash' | 'card';
+ 

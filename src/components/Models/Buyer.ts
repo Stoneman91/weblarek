@@ -1,4 +1,4 @@
-import { IBuyer } from "../../types";
+import { IBuyer, TPayment } from "../../types";
 export class Buyer {
   private payment: TPayment;
   private email: string;
@@ -56,15 +56,7 @@ export class Buyer {
 
     if (!this.email.trim()) {
       errors.email = "Введите email";
-    } else if (!this.isValidEmail(this.email)) {
-      errors.email = "Введите корректный email";
-    }
-
+    } 
     return errors;
   }
-  
-  private isValidEmail(email: string): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
   }
-}
