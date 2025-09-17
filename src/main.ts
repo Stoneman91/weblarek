@@ -6,6 +6,7 @@ import { ProductCatalog } from './components/Models/ProductCatalog';
 
 
 
+
 const api = new Api(API_URL);
 const apiClient = new ApiClient(api);
 const productsModel = new ProductCatalog();
@@ -21,4 +22,12 @@ apiClient.getProducts()
     })
     .catch(error => {
         console.error('Ошибка загрузки товаров:', error);
+    });
+
+apiClient.createOrder()
+    .then(response => {
+        console.log('Заказ создан успешно:', response);
+    })
+    .catch(error => {
+        console.error('Ошибка при создании заказа:', error);
     });

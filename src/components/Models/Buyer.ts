@@ -46,15 +46,15 @@ export class Buyer {
       errors.payment = "Выберите способ оплаты";
     }
 
-    if (!this.address.trim()) {
+    if (!this.address) {
       errors.address = "Введите адрес доставки";
     }
 
-    if (!this.phone.trim()) {
+    if (!this.phone) {
       errors.phone = "Введите телефон";
     }
 
-    if (!this.email.trim()) {
+    if (!this.email) {
       errors.email = "Введите email";
     } 
     return errors;

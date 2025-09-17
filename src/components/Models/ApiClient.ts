@@ -15,9 +15,9 @@ export class ApiClient {
 }
 }
 
-    async createOrder(orderData:object): Promise<object> {
+    async createOrder(orderData: object): Promise<object> {
         try {
-            const response = this.api.post('/order', orderData);
+            const response = this.api.post('/order/', orderData);
             return response;
         } catch (error) {
             console.error('Ошибка при создании заказа:', error);
