@@ -56,7 +56,7 @@ export class Buyer {
 
     if (!this.email) {
       errors.email = "Введите email";
-    } 
+    }
     return errors;
   }
-  }
+}

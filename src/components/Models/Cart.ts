@@ -6,8 +6,8 @@ export class Cart {
     this.items = items;
   }
   getItems(): IProduct[] {
-  return [...this.items];
-}
+    return [...this.items];
+  }
 
   addItem(product: IProduct): void {
     if (!this.isProductInCart(product.id)) {

@@ -56,12 +56,6 @@ const b1Data: Partial<IBuyer> = {
   phone: "",
   address: "",
 };
-
-b1.setData(b1Data);
-console.log("1. Данные покупателя:", b1.getData());
-b1.setData({ email: "newemail@mail.ru" });
-console.log("2. После обновления email:", b1.getData());
-
 const b2 = new Buyer();
 const b2Data: Partial<IBuyer> = {
   payment: "card",
@@ -69,13 +63,18 @@ const b2Data: Partial<IBuyer> = {
   phone: "+788932893893",
   address: "pppp",
 };
+const b3 = new Buyer();
+
+b1.setData(b1Data);
+console.log("1. Данные покупателя:", b1.getData());
+b1.setData({ email: "newemail@mail.ru" });
+console.log("2. После обновления email:", b1.getData());
 
 b2.setData(b2Data);
 console.log("3. Данные покупателя:", b2.getData());
 b2.clear();
 console.log("4. После очистки:", b2.getData());
 
-const b3 = new Buyer();
 console.log("5. Пустые данные:", b3.getData());
 console.log("6. Ошибки валидации:", b3.validate());
 
@@ -131,7 +130,7 @@ const catalog = new ProductCatalog();
 const testProducts: IProduct[] = [
   { id: "1", title: "Тестовый товар 1", price: 100 },
   { id: "2", title: "Тестовый товар 2", price: 200 },
-  { id: "3", title: "Тестовый товар 3", price: 150 }
+  { id: "3", title: "Тестовый товар 3", price: 150 },
 ];
 
 console.log("1. Массив товаров из модели:", catalog.getProducts());
@@ -140,9 +139,15 @@ catalog.setProducts(testProducts);
 console.log("2. После сохранения массива товаров:", catalog.getProducts());
 
 console.log("3. Товар с ID '2':", catalog.getProductById("2"));
-console.log("4. Товар с ID '999' (несуществующий):", catalog.getProductById("999"));
+console.log(
+  "4. Товар с ID '999' (несуществующий):",
+  catalog.getProductById("999")
+);
 
 catalog.setSelectedProduct(testProducts[0]);
-console.log("5. После сохранения товара для отображения:", catalog.getSelectedProduct());
+console.log(
+  "5. После сохранения товара для отображения:",
+  catalog.getSelectedProduct()
+);
 
 console.log("6. Получение сохраненного товара:", catalog.getSelectedProduct());
