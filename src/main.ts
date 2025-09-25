@@ -8,7 +8,7 @@ import { Cart } from "./components/Models/Cart";
 
 //Тестирование ApiClient
 
-const apiClient = new ApiClient(API_URL);
+const apiClient = new ApiClient(API_URL); 
 const productsModel = new ProductCatalog();
 const buyerModel = new Buyer();
 const cartModel = new Cart();
@@ -20,8 +20,7 @@ apiClient
 
     productsModel.setProducts(products);
 
-    const savedProducts = productsModel.getProducts();
-    console.log("# Товары сохранены в каталоге:", savedProducts);
+    console.log("# Товары сохранены в каталоге:", productsModel.getProducts());
   })
   .catch((error) => {
     console.error("# Ошибка загрузки товаров:", error);

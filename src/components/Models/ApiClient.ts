@@ -11,6 +11,6 @@ export class ApiClient extends Api {
     }
 
     createOrder(orderData: IBuyer): Promise<IOrderResult> {
-        return this.post("/order", orderData);
+        return this.post("/order/", orderData);
     }
 }
