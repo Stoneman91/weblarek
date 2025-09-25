@@ -1,4 +1,4 @@
-import { IProduct, IOrder, IOrderResult } from "../../types";
+import { IProduct, IBuyer, IOrderResult } from "../../types";
 import { Api } from "../base/Api";
 
 export class ApiClient extends Api {
@@ -10,7 +10,7 @@ export class ApiClient extends Api {
         return this.get("/product/");
     }
 
-    createOrder(order: IOrder): Promise<IOrderResult> {
-        return this.post("/order/", order);
+    createOrder(orderData: IBuyer): Promise<IOrderResult> {
+        return this.post("/order", orderData);
     }
 }
