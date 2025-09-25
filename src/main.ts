@@ -27,19 +27,9 @@ apiClient
     console.error("# Ошибка загрузки товаров:", error);
   });
 
-const orderData = {
-  payment: "online",
-  email: "proverka@testov.ru",
-  phone: "+71234567890",
-  address: "Msk 1",
-  total: 2200,
-  items: [
-    "854cef69-976d-4c2a-a18c-2aa45046c390",
-    "c101ab44-ed99-4a54-990d-47aa2bb4e7d9",
-  ],
-};
+
 apiClient
-  .createOrder(orderData)
+  .createOrder(order)
   .then((response) => {
     console.log("# Заказ создан успешно:", response);
   })

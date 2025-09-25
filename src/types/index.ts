@@ -17,6 +17,17 @@ export interface IProduct {
   price: number | null;
   description?: string;
 }
+export interface IOrder {
+    items: IProduct[];
+    buyer: IBuyer;
+    total: number;
+}
+
+export interface IOrderResult {
+    id: string;
+    total: number;
+}
+
 
 export interface IBuyer {
   payment: TPayment;
