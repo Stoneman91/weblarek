@@ -1,143 +1,128 @@
 import "./scss/styles.scss";
-import { Api } from "./components/base/Api";
 import { API_URL } from "./utils/constants";
 import { ApiClient } from "./components/Models/ApiClient";
 import { ProductCatalog } from "./components/Models/ProductCatalog";
 import { Buyer } from "./components/Models/Buyer";
-import { IBuyer, IProduct } from "./types";
+import { IProduct }from "./types";
 import { Cart } from "./components/Models/Cart";
 
 //Тестирование ApiClient
 
-const api = new Api(API_URL);
-const apiClient = new ApiClient(api);
+const apiClient = new ApiClient(API_URL);
 const productsModel = new ProductCatalog();
+const buyerModel = new Buyer();
+const cartModel = new Cart();
 
 apiClient
   .getProducts()
   .then((products) => {
     console.log("# Массив данных с товарами", products);
-
     productsModel.setProducts(products);
-
-    const savedProducts = productsModel.getProducts();
-    console.log("# Товары сохранены в каталоге:", savedProducts);
+    console.log("# Товары сохранены в каталоге:", productsModel.getProducts());
   })
   .catch((error) => {
     console.error("# Ошибка загрузки товаров:", error);
   });
 
-
 apiClient
-  .createOrder(order)
+.createOrder({
+      items: [],
+      buyer: {
+      payment: "cash",
+      email: "min@test.ru",
+      phone: "+70000000000",
+      address: "Msk 1"
+    },
+    total: 0
+  })
   .then((response) => {
-    console.log("# Заказ создан успешно:", response);
+    console.log("# Пустой заказ создан:", response);
   })
   .catch((error) => {
-    console.error("# Ошибка при создании заказа:", error);
+    console.error("# Ошибка при создании пустого заказа:", error);
   });
 
 //Тестирование Buyer
 console.log("Тестирование Buyer");
-const b1 = new Buyer();
-const b1Data: Partial<IBuyer> = {
+console.log("Начальные данные покупателя:", buyerModel.getData());
+buyerModel.setData({
   payment: "cash",
   email: "123@mail.ru",
   phone: "",
   address: "",
-};
-const b2 = new Buyer();
-const b2Data: Partial<IBuyer> = {
+});
+console.log("Данные после частичного заполнения:", buyerModel.getData());
+
+buyerModel.setData({ email: "newemail@mail.ru" });
+console.log("После обновления email:", buyerModel.getData());
+
+buyerModel.setData({
   payment: "card",
-  email: "55555@mail.ru",
-  phone: "+788932893893",
-  address: "pppp",
-};
-const b3 = new Buyer();
-
-b1.setData(b1Data);
-console.log("1. Данные покупателя:", b1.getData());
-b1.setData({ email: "newemail@mail.ru" });
-console.log("2. После обновления email:", b1.getData());
-
-b2.setData(b2Data);
-console.log("3. Данные покупателя:", b2.getData());
-b2.clear();
-console.log("4. После очистки:", b2.getData());
-
-console.log("5. Пустые данные:", b3.getData());
-console.log("6. Ошибки валидации:", b3.validate());
-
-b3.setData({
-  payment: "cash",
   email: "test@mail.ru",
   phone: "+1234567890",
   address: "ул. Пиковая, 123",
 });
-console.log("7. Заполненные данные:", b3.getData());
-console.log("8. Ошибки валидации:", b3.validate());
+console.log("Полностью заполненные данные:", buyerModel.getData());
+console.log("Ошибки валидации полных данных:", buyerModel.validate());
+
+buyerModel.clear();
+console.log("После очистки:", buyerModel.getData());
+console.log("Ошибки валидации после очистки:", buyerModel.validate());
+
+buyerModel.setData({
+  payment: "cash",
+  email: "final@test.ru",
+  phone: "+79998887766",
+  address: "ул. Новая, 456",
+});
+console.log("Данные после повторного заполнения:", buyerModel.getData());
+console.log("Финальные ошибки валидации:", buyerModel.validate());
 
 //Тестирование Cart
 const product1: IProduct = { id: "1", title: "Товар 1", price: 100 };
 const product2: IProduct = { id: "2", title: "Товар 2", price: 200 };
 const product3: IProduct = { id: "3", title: "Товар 3", price: 150 };
 
-const cart = new Cart();
-
 console.log("Тестирование Cart");
 
-console.log("1. Начальный массив товаров:", cart.getItems());
+console.log("1. Начальный массив товаров:", cartModel.getItems());
 
-cart.addItem(product1);
-cart.addItem(product2);
+cartModel.addItem(product1);
+cartModel.addItem(product2);
 
-console.log("2. После добавления 2 товаров:", cart.getItems());
+console.log("2. После добавления 2 товаров:", cartModel.getItems());
 
-console.log("3. Товар '1' в корзине?", cart.isProductInCart("1"));
-console.log("4. Товар '3' в корзине?", cart.isProductInCart("3"));
+console.log("3. Товар '1' в корзине?", cartModel.isProductInCart("1"));
+console.log("4. Товар '3' в корзине?", cartModel.isProductInCart("3"));
 
-console.log("5. Количество товаров:", cart.getItemsCount());
-console.log("6. Общая стоимость:", cart.getTotalPrice());
+console.log("5. Количество товаров:", cartModel.getItemsCount());
+console.log("6. Общая стоимость:", cartModel.getTotalPrice());
 
-cart.removeItem("1");
-console.log("7. После удаления товара '1':", cart.getItems());
+cartModel.removeItem("1");
+console.log("7. После удаления товара '1':", cartModel.getItems());
 
-cart.addItem(product3);
-console.log("8. После добавления третьего товара:", cart.getItems());
-console.log("9. Количество товаров:", cart.getItemsCount());
-console.log("10. Общая стоимость:", cart.getTotalPrice());
+cartModel.addItem(product3);
+console.log("8. После добавления третьего товара:", cartModel.getItems());
+console.log("9. Количество товаров:", cartModel.getItemsCount());
+console.log("10. Общая стоимость:", cartModel.getTotalPrice());
 
-cart.clear();
-console.log("11. После очистки:", cart.getItems());
-console.log("12. Количество после очистки:", cart.getItemsCount());
+cartModel.clear();
+console.log("11. После очистки:", cartModel.getItems());
+console.log("12. Количество после очистки:", cartModel.getItemsCount());
 
 // Тестирование ProductCatalog
-
-console.log("ProductCatalog");
-
-const catalog = new ProductCatalog();
-
-const testProducts: IProduct[] = [
-  { id: "1", title: "Тестовый товар 1", price: 100 },
-  { id: "2", title: "Тестовый товар 2", price: 200 },
-  { id: "3", title: "Тестовый товар 3", price: 150 },
-];
-
-console.log("1. Массив товаров из модели:", catalog.getProducts());
-
-catalog.setProducts(testProducts);
-console.log("2. После сохранения массива товаров:", catalog.getProducts());
-
-console.log("3. Товар с ID '2':", catalog.getProductById("2"));
-console.log(
-  "4. Товар с ID '999' (несуществующий):",
-  catalog.getProductById("999")
-);
-
-catalog.setSelectedProduct(testProducts[0]);
-console.log(
-  "5. После сохранения товара для отображения:",
-  catalog.getSelectedProduct()
-);
-
-console.log("6. Получение сохраненного товара:", catalog.getSelectedProduct());
+console.log("1. Массив товаров из модели:", productsModel.getProducts()); 
+const currentProducts = productsModel.getProducts();
+console.log("2. После сохранения массива товаров:", productsModel.getProducts()); 
+ 
+console.log("3. Товар с ID '2':", productsModel.getProductById("2")); 
+console.log("4. Товар с ID '999' (несуществующий):", 
+  productsModel.getProductById("999") 
+); 
+productsModel.setSelectedProduct(currentProducts[0]); 
+console.log( 
+  "5. После сохранения товара для отображения:", 
+  productsModel.getSelectedProduct() 
+); 
+ 
+console.log("6. Получение сохраненного товара:", productsModel.getSelectedProduct());

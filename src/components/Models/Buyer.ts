@@ -5,16 +5,11 @@ export class Buyer {
   private phone: string;
   private address: string;
 
-  constructor(
-    payment: TPayment = "" as TPayment,
-    email: string = "",
-    phone: string = "",
-    address: string = ""
-  ) {
-    this.payment = payment;
-    this.email = email;
-    this.phone = phone;
-    this.address = address;
+  constructor() {
+    this.payment = "" as TPayment;
+    this.email = "";
+    this.phone = "";
+    this.address = "";
   }
 
   setData(data: Partial<IBuyer>): void {

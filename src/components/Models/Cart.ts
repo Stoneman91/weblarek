@@ -2,13 +2,17 @@ import { IProduct } from "../../types";
 export class Cart {
   private items: IProduct[];
 
-  constructor(items: IProduct[] = []) {
-    this.items = items;
+  constructor() {
+      this.items = [];
   }
   getItems(): IProduct[] {
     return [...this.items];
   }
 
+    isProductInCart(productId: string): boolean {
+    return this.items.some((item) => item.id === productId);
+  }
+  
   addItem(product: IProduct): void {
     if (!this.isProductInCart(product.id)) {
       this.items.push(product);
@@ -31,7 +35,5 @@ export class Cart {
     return this.items.length;
   }
 
-  isProductInCart(productId: string): boolean {
-    return this.items.some((item) => item.id === productId);
-  }
+
 }
