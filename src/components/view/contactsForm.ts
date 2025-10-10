@@ -31,6 +31,7 @@ export class ContactsForm extends Form<IContactsForm> {
     );
   }
 
+  
   set email(value: string) {
     this._emailInput.value = value;
   }
