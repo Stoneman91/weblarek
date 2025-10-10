@@ -1,7 +1,13 @@
 import { ensureElement } from "../../utils/utils";
 import { Card, ICardActions } from "./card";
 
-export class CardPreview extends Card<ICardActions> {
+interface ICardPreview {
+    image:string;
+    description:string;
+    buttonText:string
+}
+
+export class CardPreview extends Card<ICardPreview> {
     protected _cardImage: HTMLImageElement;
     protected _cardText: HTMLElement;
     protected _cardButton: HTMLButtonElement;

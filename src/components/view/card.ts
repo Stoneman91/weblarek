@@ -5,7 +5,7 @@ export interface ICardActions {
     onClick?: (event: MouseEvent) => void;
 }
 
-export abstract class Card<T> extends Component<T> {
+export abstract class Card<T> extends Component<ICardActions> {
     protected _title: HTMLElement;
     protected _price: HTMLElement;
 

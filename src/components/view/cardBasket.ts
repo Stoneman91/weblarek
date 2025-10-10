@@ -1,7 +1,11 @@
 import { ensureElement } from "../../utils/utils";
 import { Card, ICardActions } from "./card";
 
-export class CardBasket extends Card<ICardActions> {
+interface ICardBusket {
+    index:HTMLElement;
+}
+
+export class CardBasket extends Card<ICardBusket> {
     protected _index: HTMLElement;
     protected _deleteButton: HTMLButtonElement;
 
