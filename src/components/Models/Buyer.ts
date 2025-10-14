@@ -1,11 +1,12 @@
 import { IBuyer, TPayment } from "../../types";
+import { EventEmitter } from "../base/Events";
 export class Buyer {
   private payment: TPayment;
   private email: string;
   private phone: string;
   private address: string;
 
-  constructor() {
+  constructor(private events:EventEmitter) {
     this.payment = "" as TPayment;
     this.email = "";
     this.phone = "";
@@ -17,6 +18,8 @@ export class Buyer {
     if (data.email) this.email = data.email;
     if (data.phone) this.phone = data.phone;
     if (data.address) this.address = data.address;
+    this.events.emit(
+    'BuyerData:changed');
   }
 
   getData(): IBuyer {
@@ -33,6 +36,8 @@ export class Buyer {
     this.email = "";
     this.phone = "";
     this.address = "";
+    this.events.emit(
+    'BuyerData:cleared');
   }
   validate(): Partial<Record<keyof IBuyer, string>> {
     const errors: Partial<Record<keyof IBuyer, string>> = {};

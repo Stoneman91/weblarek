@@ -9,7 +9,7 @@ import { EventEmitter } from "./components/base/Events";
 
 const events = new EventEmitter();
 const apiClient = new ApiClient(API_URL);
-const productsModel = new ProductCatalog();
+const productsModel = new ProductCatalog(events);
 const gallery = new Gallery(events, ensureElement<HTMLElement>(".page"));
 
 events.on("products:changed", () => {
