@@ -2,12 +2,7 @@ import { ensureElement } from "../../utils/utils";
 import { IEvents } from "../base/Events";
 import { Form } from "./form";
 
-interface IOrderForm {
-  payment: string;
-  address: string;
-}
-
-export class OrderForm extends Form<IOrderForm> {
+export class OrderForm extends Form {
   protected cardButton: HTMLButtonElement;
   protected cashButton: HTMLButtonElement;
   protected addressInput: HTMLInputElement;

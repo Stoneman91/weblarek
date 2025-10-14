@@ -2,12 +2,7 @@ import { ensureElement } from "../../utils/utils";
 import { IEvents } from "../base/Events";
 import { Form } from "./form";
 
-interface IContactsForm {
-  email: string;
-  phone: string;
-}
-
-export class ContactsForm extends Form<IContactsForm> {
+export class ContactsForm extends Form {
   protected _emailInput: HTMLInputElement;
   protected _phoneInput: HTMLInputElement;
 
@@ -23,11 +18,11 @@ export class ContactsForm extends Form<IContactsForm> {
       this.container
     );
 
-    this._emailInput.addEventListener("input", () =>
-      this.events.emit("contacts:email", { email: this._emailInput.value })
+    this._emailInput.addEventListener('input', () =>
+      this.events.emit('contacts:email', { email: this._emailInput.value })
     );
-    this._phoneInput.addEventListener("input", () =>
-      this.events.emit("contacts:phone", { phone: this._phoneInput.value })
+    this._phoneInput.addEventListener('input', () =>
+      this.events.emit('contacts:phon', { phone: this._phoneInput.value })
     );
   }
 
