@@ -1,14 +1,15 @@
 import { IProduct } from "../../types";
 
+
 export class ProductCatalog {
   private products: IProduct[] = [];
   private selectedProduct: IProduct | null = null;
-
+  
   setProducts(products: IProduct[]): void {
     this.products = products;
   }
   getProducts(): IProduct[] {
-    return this.products;
+    return this.products || [];
   }
 
   getProductById(id: string) {

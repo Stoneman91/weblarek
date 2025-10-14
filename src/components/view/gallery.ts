@@ -3,7 +3,7 @@ import { Component } from "../base/Component";
 import { IEvents } from "../base/Events";
 
 interface IGallery {
-    catalog: HTMLElement[];
+    items: HTMLElement[];
 }
 
 export class Gallery extends Component<IGallery> {
@@ -14,7 +14,7 @@ export class Gallery extends Component<IGallery> {
         this.catalogElement = ensureElement<HTMLElement>('.gallery', this.container);
     }
 
-    set catalog(items: HTMLElement[]) {
+    set items(items: HTMLElement[]) {
         this.catalogElement.replaceChildren(...items);
     }
 }
