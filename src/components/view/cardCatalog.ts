@@ -1,40 +1,44 @@
 import { IProduct } from "../../types";
-import { categoryMap } from "../../utils/constants";
+import { categoryMap, CDN_URL } from "../../utils/constants";
 import { ensureElement } from "../../utils/utils";
 import { Card, ICardActions } from "./card";
 
 type CategoryKey = keyof typeof categoryMap;
-export type TCardCatalog = Pick<IProduct, 'image' | 'category'>;
+export type TCardCatalog = Pick<IProduct, "image" | "category">;
 
 export class CardCatalog extends Card<TCardCatalog> {
-    protected imgElement: HTMLImageElement;
-    protected categoryElement: HTMLElement;
+  protected imgElement: HTMLImageElement;
+  protected categoryElement: HTMLElement;
 
-    constructor(container: HTMLElement, actions: ICardActions) {
-        super(container);
-        this.categoryElement = ensureElement<HTMLElement> (
-            '.card__category', this.container);
-        
-            this.imgElement = ensureElement<HTMLImageElement> (
-                '.card__image', this.container
-            );
-            if (actions ?.onClick) {
-                this.container.addEventListener('click', actions.onClick);
-            }
+  constructor(container: HTMLElement, actions: ICardActions) {
+    super(container);
+    this.categoryElement = ensureElement<HTMLElement>(
+      ".card__category",
+      this.container
+    );
+
+    this.imgElement = ensureElement<HTMLImageElement>(
+      ".card__image",
+      this.container
+    );
+    if (actions?.onClick) {
+      this.container.addEventListener("click", actions.onClick);
     }
+  }
 
-set category (value: string) {
+  set category(value: string) {
     this.categoryElement.textContent = value;
 
-    for (const key in categoryMap){
-        this.categoryElement.classList.toggle(
-            categoryMap[key as CategoryKey],
-            key === value
-        );
+    for (const key in categoryMap) {
+      this.categoryElement.classList.toggle(
+        categoryMap[key as CategoryKey],
+        key === value
+      );
     }
-}
+  }
 
-set image(value: string) {
-    this.setImage(this.imgElement, value);
-}
+  set image(value: string) {
+    this.imgElement.src = `${CDN_URL}${value}`;
+    this.imgElement.alt = "Product image";
+  }
 }

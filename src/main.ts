@@ -27,13 +27,29 @@ events.on("products:changed", () => {
 apiClient
   .getProducts()
   .then((products) => {
-    console.log("# Массив данных с товарами", products);
-
+    console.log("📥 Received products from API:", products);
+    
+    // Проверьте первый товар
+    if (products.length > 0) {
+      const firstProduct = products[0];
+      console.log("🔍 First product details:", {
+        title: firstProduct.title,
+        image: firstProduct.image,
+        category: firstProduct.category,
+        price: firstProduct.price
+      });
+      
+      // Проверьте доступность изображения
+      if (firstProduct.image) {
+        fetch(firstProduct.image, { method: 'HEAD' })
+          .then(() => console.log('✅ First product image is accessible'))
+          .catch(() => console.error('❌ First product image is not accessible'));
+      }
+    }
+    
     productsModel.setProducts(products);
-
-    console.log("# Товары сохранены в каталоге:", productsModel.getProducts());
     events.emit("products:changed");
   })
   .catch((error) => {
-    console.error("# Ошибка загрузки товаров:", error);
+    console.error("💥 Error loading products:", error);
   });
