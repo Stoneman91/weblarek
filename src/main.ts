@@ -27,29 +27,11 @@ events.on("products:changed", () => {
 apiClient
   .getProducts()
   .then((products) => {
-    console.log("📥 Received products from API:", products);
-    
-    // Проверьте первый товар
-    if (products.length > 0) {
-      const firstProduct = products[0];
-      console.log("🔍 First product details:", {
-        title: firstProduct.title,
-        image: firstProduct.image,
-        category: firstProduct.category,
-        price: firstProduct.price
-      });
-      
-      // Проверьте доступность изображения
-      if (firstProduct.image) {
-        fetch(firstProduct.image, { method: 'HEAD' })
-          .then(() => console.log('✅ First product image is accessible'))
-          .catch(() => console.error('❌ First product image is not accessible'));
-      }
-    }
+    console.log("Received products from API:", products);
     
     productsModel.setProducts(products);
     events.emit("products:changed");
   })
   .catch((error) => {
-    console.error("💥 Error loading products:", error);
+    console.error("Error loading products:", error);
   });
