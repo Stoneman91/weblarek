@@ -33,7 +33,7 @@ events.on("products:changed", () => {
 });
 
 events.on("card:select", (item: IProduct) => {
-  productsModel.setSelectedProduct(item); // Сохраняем выбранный товар в модель
+  productsModel.setSelectedProduct(item);
 });
 
 events.on("selectedProduct:changed", () => {

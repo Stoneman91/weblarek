@@ -1,3 +1,4 @@
+import { CDN_URL } from "../../utils/constants";
 import { ensureElement } from "../../utils/utils";
 import { Card, ICardActions } from "./card";
 
@@ -24,8 +25,9 @@ export class CardPreview extends Card<ICardPreview> {
         }
     }
 
-    set image(value: string) {
-        this._cardImage.src = value;
+   set image(value: string) {
+      this._cardImage.src = `${CDN_URL}${value}`;
+      this._cardImage.alt = "Product image";
     }
 
     set description(value: string) {

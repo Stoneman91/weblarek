@@ -25,4 +25,5 @@ export abstract class Card<T> extends Component<T> {
   set price(value: string | number) {
     this._price.textContent = `${value} синапсов`;
   }
+  
 }
