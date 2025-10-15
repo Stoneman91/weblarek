@@ -8,14 +8,13 @@ export interface ICardActions {
 export abstract class Card<T> extends Component<T> {
   protected _title: HTMLElement;
   protected _price: HTMLElement;
-  protected _actions?: ICardActions;
 
-  constructor(protected container: HTMLElement) {
+  constructor(protected container: HTMLElement, actions?: ICardActions) {
     super(container);
     this._title = ensureElement<HTMLElement>(".card__title", this.container);
     this._price = ensureElement<HTMLElement>(".card__price", this.container);
-    if (this._actions?.onClick) {
-      this.container.addEventListener("click", this._actions.onClick);
+    if (actions?.onClick) {
+      this.container.addEventListener("click", actions.onClick);
     }
   }
 

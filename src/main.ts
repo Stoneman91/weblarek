@@ -6,11 +6,19 @@ import { CardCatalog } from "./components/view/cardCatalog";
 import { cloneTemplate, ensureElement } from "./utils/utils";
 import { Gallery } from "./components/view/gallery";
 import { EventEmitter } from "./components/base/Events";
+import { Modal } from "./components/view/modal";
+import { IProduct } from "./types";
+import { CardPreview } from "./components/view/cardPreview";
 
 const events = new EventEmitter();
 const apiClient = new ApiClient(API_URL);
 const productsModel = new ProductCatalog(events);
 const gallery = new Gallery(events, ensureElement<HTMLElement>(".page"));
+const modal = new Modal(events, ensureElement<HTMLElement>("#modal-container"));
+
+events.on("modal:close", () => {
+  modal.isOpen = false;
+});
 
 events.on("products:changed", () => {
   const products = productsModel.getProducts();
@@ -24,14 +32,38 @@ events.on("products:changed", () => {
   gallery.render({ items: itemCards });
 });
 
+events.on("card:select", (item: IProduct) => {
+  productsModel.setSelectedProduct(item); // Сохраняем выбранный товар в модель
+});
+
+events.on("selectedProduct:changed", () => {
+  const selectedProduct = productsModel.getSelectedProduct();
+
+  if (selectedProduct) {
+    const previewTemplate = ensureElement<HTMLTemplateElement>("#card-preview");
+    const cardPreview = new CardPreview(
+      cloneTemplate<HTMLElement>(previewTemplate),
+      {
+        onClick: () => events.emit("product:addToCart", selectedProduct),
+      }
+    );
+
+    const previewContent = cardPreview.render(selectedProduct);
+    modal.content = previewContent;
+    modal.isOpen = true;
+  }
+});
+
 apiClient
   .getProducts()
   .then((products) => {
-    console.log("Received products from API:", products);
-    
+    console.log("# Массив данных с товарами", products);
+
     productsModel.setProducts(products);
+
+    console.log("# Товары сохранены в каталоге:", productsModel.getProducts());
     events.emit("products:changed");
   })
   .catch((error) => {
-    console.error("Error loading products:", error);
+    console.error("# Ошибка загрузки товаров:", error);
   });
