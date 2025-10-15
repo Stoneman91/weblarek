@@ -9,12 +9,25 @@ import { EventEmitter } from "./components/base/Events";
 import { Modal } from "./components/view/modal";
 import { IProduct } from "./types";
 import { CardPreview } from "./components/view/cardPreview";
+import { Basket } from "./components/view/basket";
+import { Cart } from "./components/Models/Cart";
+import { Header } from "./components/view/header";
 
 const events = new EventEmitter();
 const apiClient = new ApiClient(API_URL);
 const productsModel = new ProductCatalog(events);
 const gallery = new Gallery(events, ensureElement<HTMLElement>(".page"));
 const modal = new Modal(events, ensureElement<HTMLElement>("#modal-container"));
+const header = new Header(events, ensureElement<HTMLElement>(".header"));
+
+events.on('basket:open', () => {
+  const basketTemplate = ensureElement<HTMLTemplateElement>('#basket');
+  const basketElement = cloneTemplate<HTMLElement>(basketTemplate);
+  const basket = new Basket(events, basketElement);
+  
+  modal.content = basketElement;
+  modal.isOpen = true;
+});
 
 events.on("modal:close", () => {
   modal.isOpen = false;
