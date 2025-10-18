@@ -38,6 +38,7 @@ export class Cart {
 
   clear(): void {
     this.items = [];
+    this.events.emit("cart:cleared");
   }
 
   getTotalPrice(): number {

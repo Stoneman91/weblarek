@@ -16,6 +16,7 @@ import { CardBasket } from "./components/view/cardBasket";
 import { OrderForm } from "./components/view/orderForm";
 import { Buyer } from "./components/Models/Buyer";
 import { ContactsForm } from "./components/view/contactsForm";
+import { OrderModalSuccess } from "./components/view/modalOrderSuccess";
 
 const events = new EventEmitter();
 const apiClient = new ApiClient(API_URL);
@@ -124,10 +125,41 @@ events.on("basket:order", () => {
 });
 
 events.on("order:submit", () => {
-  const contactsForm = new ContactsForm(events, cloneTemplate(ensureElement<HTMLTemplateElement>('#order')));
+  const contactsForm = new ContactsForm(events, cloneTemplate(ensureElement<HTMLTemplateElement>('#contacts')), buyer);
   modal.content = contactsForm.render();
   modal.isOpen = true;
 });
+
+events.on("contacts:submit", () => {
+
+  const orderData = {
+    ...buyer.getData(),
+    items: cart.getItems().map(item => item.id),
+    total: cart.getTotalPrice()
+  };
+
+  apiClient.createOrder(orderData)
+    .then((result) => {
+      const successTemplate = ensureElement<HTMLTemplateElement>('#success');
+      const successElement = cloneTemplate<HTMLElement>(successTemplate);
+      const success = new OrderModalSuccess(events, successElement);
+      
+      success.total = cart.getTotalPrice();
+      modal.content = successElement;
+      
+      cart.clear();
+      buyer.clear();
+    })
+    .catch((error) => {
+      console.error("Ошибка оформления заказа:", error);
+    });
+});
+
+events.on("orderSuccess:close", () => {
+  modal.isOpen = false;
+  header.counter = 0;
+});
+
 events.onAll(({ eventName, data }) => {
   console.log(eventName, data);
 });
