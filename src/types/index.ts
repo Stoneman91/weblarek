@@ -30,4 +30,4 @@ export interface IBuyer {
   address: string;
 }
 
-export type TPayment = "cash" | "online";
+export type TPayment = "cash" | "card";

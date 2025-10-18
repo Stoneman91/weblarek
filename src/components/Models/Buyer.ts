@@ -36,8 +36,6 @@ export class Buyer {
     this.email = "";
     this.phone = "";
     this.address = "";
-    this.events.emit(
-    'BuyerData:cleared');
   }
   validate(): Partial<Record<keyof IBuyer, string>> {
     const errors: Partial<Record<keyof IBuyer, string>> = {};

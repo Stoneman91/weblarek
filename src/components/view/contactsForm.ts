@@ -9,24 +9,18 @@ export class ContactsForm extends Form {
   constructor(events: IEvents, container: HTMLElement) {
     super(events, container, "contacts");
 
-    this._emailInput = ensureElement<HTMLInputElement>(
-      'input[name="email"]',
-      this.container
-    );
-    this._phoneInput = ensureElement<HTMLInputElement>(
-      'input[name="phone"]',
-      this.container
-    );
+    // Ищем внутри контейнера формы
+    this._emailInput = ensureElement<HTMLInputElement>('input[name="email"]', this.container);
+    this._phoneInput = ensureElement<HTMLInputElement>('input[name="phone"]', this.container);
 
     this._emailInput.addEventListener('input', () =>
       this.events.emit('contacts:email', { email: this._emailInput.value })
     );
     this._phoneInput.addEventListener('input', () =>
-      this.events.emit('contacts:phon', { phone: this._phoneInput.value })
+      this.events.emit('contacts:phone', { phone: this._phoneInput.value })
     );
   }
 
-  
   set email(value: string) {
     this._emailInput.value = value;
   }

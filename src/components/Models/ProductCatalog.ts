@@ -10,6 +10,7 @@ export class ProductCatalog {
 
   setProducts(products: IProduct[]): void {
     this.products = products;
+    this.events.emit('products:changed');
   }
   getProducts(): IProduct[] {
     return this.products || [];

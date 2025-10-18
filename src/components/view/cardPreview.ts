@@ -3,15 +3,19 @@ import { ensureElement } from "../../utils/utils";
 import { Card, ICardActions } from "./card";
 
 interface ICardPreview {
-    image:string;
-    description:string;
-    buttonText:string
+    image: string;
+    description: string;
+    buttonText: string;
+    category: string;
+    title: string;
+    price: string | number | null;
 }
 
 export class CardPreview extends Card<ICardPreview> {
     protected _cardImage: HTMLImageElement;
     protected _cardText: HTMLElement;
     protected _cardButton: HTMLButtonElement;
+    protected _category: HTMLElement;
 
     constructor(protected container: HTMLElement,protected actions?: ICardActions) {
         super(container);
@@ -19,6 +23,7 @@ export class CardPreview extends Card<ICardPreview> {
         this._cardImage = ensureElement<HTMLImageElement>('.card__image', this.container);
         this._cardText = ensureElement<HTMLElement>('.card__text', this.container);
         this._cardButton = ensureElement<HTMLButtonElement>('.card__button', this.container);
+        this._category = ensureElement<HTMLElement>('.card__category', this.container);
         
         if (actions?.onClick) {
             this._cardButton.addEventListener('click', actions.onClick);
@@ -36,5 +41,9 @@ export class CardPreview extends Card<ICardPreview> {
 
     set buttonText(value: string) {
         this._cardButton.textContent = value;
+    }
+
+    set category(value: string) {
+        this._category.textContent = value;
     }
 }

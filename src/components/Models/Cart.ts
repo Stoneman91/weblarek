@@ -1,6 +1,10 @@
 import { IProduct } from "../../types";
 import { EventEmitter } from "../base/Events";
 export class Cart {
+  static getItemsCount(): number {
+    throw new Error("Method not implemented.");
+  }
+ 
   private items: IProduct[];
 
   constructor(private events: EventEmitter) {
@@ -34,7 +38,6 @@ export class Cart {
 
   clear(): void {
     this.items = [];
-    this.events.emit("cart:cleared");
   }
 
   getTotalPrice(): number {

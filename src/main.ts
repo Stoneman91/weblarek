@@ -12,37 +12,67 @@ import { CardPreview } from "./components/view/cardPreview";
 import { Basket } from "./components/view/basket";
 import { Cart } from "./components/Models/Cart";
 import { Header } from "./components/view/header";
+import { CardBasket } from "./components/view/cardBasket";
+import { OrderForm } from "./components/view/orderForm";
+import { Buyer } from "./components/Models/Buyer";
+import { ContactsForm } from "./components/view/contactsForm";
 
 const events = new EventEmitter();
 const apiClient = new ApiClient(API_URL);
 const productsModel = new ProductCatalog(events);
-const gallery = new Gallery(events, ensureElement<HTMLElement>(".page"));
-const modal = new Modal(events, ensureElement<HTMLElement>("#modal-container"));
-const header = new Header(events, ensureElement<HTMLElement>(".header"));
+const gallery = new Gallery(events, ensureElement(".page"));
+const modal = new Modal(events, ensureElement("#modal-container"));
+const header = new Header(events, ensureElement(".header"));
+const cart = new Cart(events);
+const buyer = new Buyer(events);
 
-events.on('basket:open', () => {
-  const basketTemplate = ensureElement<HTMLTemplateElement>('#basket');
-  const basketElement = cloneTemplate<HTMLElement>(basketTemplate);
-  const basket = new Basket(events, basketElement);
-  
-  modal.content = basketElement;
-  modal.isOpen = true;
+events.on("cart:changed", () => {
+  header.counter = cart.getItemsCount();
 });
 
+events.on('basket:open', () => {
+  const basket = new Basket(events, cloneTemplate(ensureElement<HTMLTemplateElement>('#basket')));
+  const items = cart.getItems();
+  
+  if (items.length === 0) {
+    basket.items = [];
+    basket.total = 0;
+    basket.disabled = true;
+  } else {
+    basket.items = items.map((item, index) => {
+      const cardBasket = new CardBasket(cloneTemplate(ensureElement<HTMLTemplateElement>('#card-basket')), {
+        onClick: () => {
+          cart.removeItem(item.id);
+          events.emit('basket:open');
+        }
+      });
+      
+      cardBasket.title = item.title;
+      cardBasket.price = item.price || 0;
+      cardBasket.index = index + 1;
+      
+      return cardBasket.render();
+    });
+    
+    basket.total = cart.getTotalPrice();
+    basket.disabled = false;
+  }
+  
+  modal.content = basket.render();;
+  modal.isOpen = true;
+});
 events.on("modal:close", () => {
   modal.isOpen = false;
 });
 
 events.on("products:changed", () => {
-  const products = productsModel.getProducts();
-  const itemCards = products.map((item) => {
-    const card = new CardCatalog(cloneTemplate<HTMLElement>("#card-catalog"), {
-      onClick: () => events.emit("card:select", item),
-    });
-    return card.render(item);
+  gallery.render({ 
+    items: productsModel.getProducts().map(item =>
+      new CardCatalog(cloneTemplate(ensureElement<HTMLTemplateElement>("#card-catalog")), {
+        onClick: () => events.emit("card:select", item)
+      }).render(item)
+    )
   });
-
-  gallery.render({ items: itemCards });
 });
 
 events.on("card:select", (item: IProduct) => {
@@ -53,30 +83,56 @@ events.on("selectedProduct:changed", () => {
   const selectedProduct = productsModel.getSelectedProduct();
 
   if (selectedProduct) {
-    const previewTemplate = ensureElement<HTMLTemplateElement>("#card-preview");
     const cardPreview = new CardPreview(
-      cloneTemplate<HTMLElement>(previewTemplate),
+      cloneTemplate(ensureElement<HTMLTemplateElement>("#card-preview")),
       {
-        onClick: () => events.emit("product:addToCart", selectedProduct),
+        onClick: () => {
+          if (cart.isProductInCart(selectedProduct.id)) {
+            cart.removeItem(selectedProduct.id);
+             modal.isOpen = false;
+          } else {
+            events.emit("product:addToCart", selectedProduct);
+          }
+        }
       }
     );
 
-    const previewContent = cardPreview.render(selectedProduct);
-    modal.content = previewContent;
+  modal.content = cardPreview.render({
+      title: selectedProduct.title ,
+      price: selectedProduct.price || 0,
+      category: selectedProduct.category || '',
+      image: selectedProduct.image || '',
+      description: selectedProduct.description || '',
+      buttonText: cart.isProductInCart(selectedProduct.id) 
+        ? "Удалить из корзины" 
+        : "В корзину"
+    });
+
     modal.isOpen = true;
   }
 });
 
-apiClient
-  .getProducts()
-  .then((products) => {
-    console.log("# Массив данных с товарами", products);
+events.on("product:addToCart", (item: IProduct) => {
+  cart.addItem(item);
+  modal.isOpen = false;
+});
 
-    productsModel.setProducts(products);
+events.on("basket:order", () => {
+  const orderForm = new OrderForm(events, cloneTemplate(ensureElement<HTMLTemplateElement>('#order')), buyer);
+  modal.content = orderForm.render();
+  modal.isOpen = true;
+});
 
-    console.log("# Товары сохранены в каталоге:", productsModel.getProducts());
-    events.emit("products:changed");
-  })
-  .catch((error) => {
-    console.error("# Ошибка загрузки товаров:", error);
-  });
+events.on("order:submit", () => {
+  const contactsForm = new ContactsForm(events, cloneTemplate(ensureElement<HTMLTemplateElement>('#order')));
+  modal.content = contactsForm.render();
+  modal.isOpen = true;
+});
+events.onAll(({ eventName, data }) => {
+  console.log(eventName, data);
+});
+
+
+apiClient.getProducts()
+  .then(products => productsModel.setProducts(products))
+  .catch(error => console.error("Ошибка загрузки:", error));
