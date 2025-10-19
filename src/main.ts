@@ -202,6 +202,8 @@ events.on("contacts:phone", (data: { phone: string }) => {
 
 events.on("BuyerData:changed", () => {
   buyer.getData();
+  orderForm.render();
+  contactsForm.render();
 });
 
 apiClient
