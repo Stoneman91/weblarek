@@ -26,48 +26,61 @@ const modal = new Modal(events, ensureElement("#modal-container"));
 const header = new Header(events, ensureElement(".header"));
 const cart = new Cart(events);
 const buyer = new Buyer(events);
-const basket = new Basket(events, cloneTemplate(ensureElement<HTMLTemplateElement>('#basket')));
-const orderForm = new OrderForm(events, cloneTemplate(ensureElement<HTMLTemplateElement>('#order')), buyer);
-const contactsForm = new ContactsForm(events, cloneTemplate(ensureElement<HTMLTemplateElement>('#contacts')), buyer);
-const orderSuccess = new OrderModalSuccess(events, cloneTemplate(ensureElement<HTMLTemplateElement>('#success')));
-
+const basket = new Basket(
+  events,
+  cloneTemplate(ensureElement<HTMLTemplateElement>("#basket"))
+);
+const orderForm = new OrderForm(
+  events,
+  cloneTemplate(ensureElement<HTMLTemplateElement>("#order")),
+  buyer
+);
+const contactsForm = new ContactsForm(
+  events,
+  cloneTemplate(ensureElement<HTMLTemplateElement>("#contacts")),
+  buyer
+);
+const orderSuccess = new OrderModalSuccess(
+  events,
+  cloneTemplate(ensureElement<HTMLTemplateElement>("#success"))
+);
 
 events.on("cart:changed", () => {
   header.counter = cart.getItemsCount();
 });
 
-events.on('basket:open', () => {
+events.on("basket:open", () => {
   const items = cart.getItems();
-  
+
   if (items.length === 0) {
     basket.render({
       items: [],
       total: 0,
-      disabled: true
+      disabled: true,
     });
   } else {
     const basketItems = items.map((item, index) => {
       const cardBasket = new CardBasket(
-        cloneTemplate(ensureElement<HTMLTemplateElement>('#card-basket')), 
+        cloneTemplate(ensureElement<HTMLTemplateElement>("#card-basket")),
         {
-          onClick: () => events.emit('basket:remove', item)
+          onClick: () => events.emit("basket:remove", item),
         }
       );
-      
+
       return cardBasket.render({
         title: item.title,
         price: item.price || 0,
-        index: index + 1
+        index: index + 1,
       });
     });
-    
+
     basket.render({
       items: basketItems,
       total: cart.getTotalPrice(),
-      disabled: false
+      disabled: false,
     });
   }
-  
+
   modal.content = basket.render();
   modal.isOpen = true;
 });
@@ -75,18 +88,20 @@ events.on("modal:close", () => {
   modal.isOpen = false;
 });
 
-events.on('basket:remove', (item: IProduct) => {
+events.on("basket:remove", (item: IProduct) => {
   cart.removeItem(item.id);
 });
 
-
 events.on("products:changed", () => {
-  gallery.render({ 
-    items: productsModel.getProducts().map(item =>
-      new CardCatalog(cloneTemplate(ensureElement<HTMLTemplateElement>("#card-catalog")), {
-        onClick: () => events.emit("card:select", item)
-      }).render(item)
-    )
+  gallery.render({
+    items: productsModel.getProducts().map((item) =>
+      new CardCatalog(
+        cloneTemplate(ensureElement<HTMLTemplateElement>("#card-catalog")),
+        {
+          onClick: () => events.emit("card:select", item),
+        }
+      ).render(item)
+    ),
   });
 });
 
@@ -108,26 +123,24 @@ events.on("selectedProduct:changed", () => {
           } else {
             events.emit("product:addToCart", selectedProduct);
           }
-        }
+        },
       }
     );
 
-  modal.content = cardPreview.render({
-      title: selectedProduct.title ,
+    modal.content = cardPreview.render({
+      title: selectedProduct.title,
       price: selectedProduct.price || 0,
-      category: selectedProduct.category || '',
-      image: selectedProduct.image || '',
-      description: selectedProduct.description || '',
-      buttonText: cart.isProductInCart(selectedProduct.id) 
-        ? "Удалить из корзины" 
-        : "В корзину"
+      category: selectedProduct.category || "",
+      image: selectedProduct.image || "",
+      description: selectedProduct.description || "",
+      buttonText: cart.isProductInCart(selectedProduct.id)
+        ? "Удалить из корзины"
+        : "В корзину",
     });
 
     modal.isOpen = true;
   }
 });
-
-
 
 events.on("product:addToCart", (item: IProduct) => {
   cart.addItem(item);
@@ -145,19 +158,19 @@ events.on("order:submit", () => {
 });
 
 events.on("contacts:submit", () => {
-
   const orderData = {
     ...buyer.getData(),
-    items: cart.getItems().map(item => item.id),
-    total: cart.getTotalPrice()
+    items: cart.getItems().map((item) => item.id),
+    total: cart.getTotalPrice(),
   };
 
- apiClient.createOrder(orderData)
+  apiClient
+    .createOrder(orderData)
     .then(() => {
       modal.content = orderSuccess.render({
-        total: cart.getTotalPrice()
+        total: cart.getTotalPrice(),
       });
-      
+
       cart.clear();
       buyer.clear();
     })
@@ -187,10 +200,11 @@ events.on("contacts:phone", (data: { phone: string }) => {
   buyer.setData({ phone: data.phone });
 });
 
-events.on('BuyerData:changed', () => {
-  console.log('Данные покупателя обновлены:', buyer.getData());
+events.on("BuyerData:changed", () => {
+  buyer.getData();
 });
 
-apiClient.getProducts()
-  .then(products => productsModel.setProducts(products))
-  .catch(error => console.error("Ошибка загрузки:", error));
+apiClient
+  .getProducts()
+  .then((products) => productsModel.setProducts(products))
+  .catch((error) => console.error("Ошибка загрузки:", error));

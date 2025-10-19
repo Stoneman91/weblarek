@@ -20,11 +20,11 @@ export class ContactsForm extends Form {
     );
 
     this._emailInput.addEventListener("input", () => {
-      this.buyer.setData({ email: this._emailInput.value });
+      this.events.emit("contacts:email", { email: this._emailInput.value });
     });
 
     this._phoneInput.addEventListener("input", () => {
-      this.buyer.setData({ phone: this._phoneInput.value });
+      this.events.emit("contacts:phone", { phone: this._phoneInput.value });
     });
 
     events.on("BuyerData:changed", () => {
@@ -33,14 +33,8 @@ export class ContactsForm extends Form {
   }
 
   private updateFormState(): void {
-    const data = this.buyer.getData();
     const errors = this.buyer.validate();
-    if (data.email) {
-      this._emailInput.value = data.email;
-    }
-    if (data.phone) {
-      this._phoneInput.value = data.phone;
-    }
+
     const contactErrors: string[] = [];
     if (errors.email) contactErrors.push(errors.email);
     if (errors.phone) contactErrors.push(errors.phone);
@@ -51,10 +45,11 @@ export class ContactsForm extends Form {
 
   set email(value: string) {
     this._emailInput.value = value;
-    this.buyer.setData({ email: value });
+    this.events.emit("contacts:email", { email: value });
   }
+
   set phone(value: string) {
     this._phoneInput.value = value;
-    this.buyer.setData({ phone: value });
+    this.events.emit("contacts:phone", { phone: value });
   }
 }
