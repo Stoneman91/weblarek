@@ -139,7 +139,7 @@ events.on("contacts:submit", () => {
   };
 
   apiClient.createOrder(orderData)
-    .then((result) => {
+    .then(() => {
       const successTemplate = ensureElement<HTMLTemplateElement>('#success');
       const successElement = cloneTemplate<HTMLElement>(successTemplate);
       const success = new OrderModalSuccess(events, successElement);
@@ -159,11 +159,6 @@ events.on("orderSuccess:close", () => {
   modal.isOpen = false;
   header.counter = 0;
 });
-
-events.onAll(({ eventName, data }) => {
-  console.log(eventName, data);
-});
-
 
 apiClient.getProducts()
   .then(products => productsModel.setProducts(products))

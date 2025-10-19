@@ -20,7 +20,7 @@
 
 ```
 npm install
-npm run start
+
 ```
 
 или
@@ -115,6 +115,13 @@ interface IBuyer {
   email: string; - почта
   phone: string; - номер телефона
   address: string; - адресс
+}
+
+#### Интерфейс заказа
+
+interface IOrderResult {
+    id: string;
+    total: number;
 }
 
 
@@ -214,3 +221,297 @@ constructor(api: IApi) - принимает экземпляр объекта, �
 getProducts() - делает get запрос на эндпоинт /product/ и возвращает массив товаров.
 
 createOrder() - делает post запрос на эндпоинт /order/ и передаёт в него данные, полученные в параметрах метода
+
+### View
+Классы представления (описанные ниже) отвечают за отображение данных и обработку пользовательского ввода
+#### Card
+Назначение: Базовый класс для всех карточек товаров, содержащий общие свойства и методы.
+
+Конструктор:
+
+constructor(protected container: HTMLElement, actions?: ICardActions)
+Поля:
+
+protected _title: HTMLElement - элемент заголовка
+
+protected _price: HTMLElement - элемент цены
+
+protected container: HTMLElement - контейнер карточки
+
+Методы:
+
+set title(value: string): void - установка заголовка
+
+set price(value: string | number | null): void - установка цены
+
+Интерфейс ICardActions:
+
+export interface ICardActions {
+  onClick?: (event: MouseEvent) => void;
+}
+
+#### Basket 
+Назначение: Отображает корзину покупок с списком товаров, общей стоимостью и кнопкой оформления заказа.
+
+Конструктор:
+
+constructor(protected events: IEvents, container: HTMLElement)
+Поля:
+
+protected basketList: HTMLElement - список товаров в корзине
+
+protected basketPrice: HTMLElement - элемент отображения общей стоимости
+
+protected basketButton: HTMLButtonElement - кнопка оформления заказа
+
+Методы:
+
+set items(items: HTMLElement[]): void - установка списка товаров
+
+set total(value: number): void - установка общей стоимости
+
+set disabled(value: boolean): void - активация/деактивация кнопки оформления
+
+Интерфейс IBasket:
+
+interface IBasket {
+  items: HTMLElement[];
+  total: number;
+}
+
+#### CardBasket
+Назначение: Отображает отдельный товар в корзине с возможностью удаления.
+
+Конструктор:
+
+constructor(protected container: HTMLElement, actions?: ICardActions)
+Поля:
+
+protected _index: HTMLElement - элемент отображения порядкового номера
+
+protected _deleteButton: HTMLButtonElement - кнопка удаления товара
+
+Методы:
+
+set index(value: number): void - установка порядкового номера
+
+Интерфейс ICardBusket:
+
+interface ICardBusket {
+    index: HTMLElement;
+}
+
+#### CardCatalog
+Назначение: Отображает товар в основном каталоге с изображением, категорией и ценой.
+
+Конструктор:
+
+constructor(container: HTMLElement, actions: ICardActions)
+Поля:
+
+protected imgElement: HTMLImageElement - элемент изображения товара
+
+protected categoryElement: HTMLElement - элемент категории товара
+
+Методы:
+
+set category(value: string): void - установка категории с применением стилей
+
+set image(value: string): void - установка изображения товара
+
+Тип TCardCatalog:
+
+export type TCardCatalog = Pick<IProduct, "image" | "category">;
+
+#### CardPreview 
+Назначение: Отображает детальную информацию о товаре в модальном окне при нажатии на карточку в галерее.
+
+Конструктор:
+
+constructor(protected container: HTMLElement, protected actions?: ICardActions)
+
+Поля:
+protected _cardImage: HTMLImageElement - элемент изображения
+
+protected _cardText: HTMLElement - элемент описания
+
+protected _cardButton: HTMLButtonElement - кнопка действия
+
+protected _category: HTMLElement - элемент категории
+
+Методы:
+
+set image(value: string): void - установка изображения
+
+set description(value: string): void - установка описания
+
+set buttonText(value: string): void - установка текста кнопки
+
+set category(value: string): void - установка категории
+
+Интерфейс ICardPreview:
+
+interface ICardPreview {
+    image: string;
+    description: string;
+    buttonText: string;
+    category: string;
+    title: string;
+    price: string | number | null;
+}
+
+#### Form
+Назначение: Базовый класс для всех форм с общей логикой валидации и отправки.
+
+Конструктор:
+
+constructor(protected events: IEvents, container: HTMLElement, protected formEventName: string)
+Поля:
+
+protected submitButton: HTMLButtonElement - кнопка отправки формы
+
+protected errorsElement: HTMLElement - элемент отображения ошибок
+
+Методы:
+
+set valid(value: boolean): void - активация/деактивация кнопки отправки
+
+set errors(value: string): void - установка текста ошибок
+
+Интерфейс IForm:
+
+interface IForm {
+    valid: boolean;
+    errors: string;
+}
+
+#### OrderForm
+Назначение: Форма для ввода способа оплаты и адреса доставки.
+
+Конструктор:
+
+constructor(events: IEvents, container: HTMLElement, private buyer: Buyer)
+Поля:
+
+protected cardButton: HTMLButtonElement - кнопка выбора карточной оплаты
+
+protected cashButton: HTMLButtonElement - кнопка выбора наличной оплаты
+
+protected addressInput: HTMLInputElement - поле ввода адреса
+
+private _payment: string - выбранный способ оплаты
+
+private _address: string - введенный адрес
+
+#### ContactsForm
+Назначение: Форма для ввода контактных данных (email и телефон).
+
+Конструктор:
+
+constructor(events: IEvents, container: HTMLElement, private buyer: Buyer)
+Поля:
+
+protected _emailInput: HTMLInputElement - поле ввода email
+
+protected _phoneInput: HTMLInputElement - поле ввода телефона
+
+private _email: string - введенный email
+
+private _phone: string - введенный телефон
+
+Методы:
+
+set email(value: string): void - установка email
+
+set phone(value: string): void - установка номера телефона
+
+#### Gallery 
+Назначение: Контейнер для отображения каталога товаров.
+
+Конструктор:
+
+constructor(protected events: IEvents, protected container: HTMLElement)
+Поля:
+
+protected catalogElement: HTMLElement - элемент каталога
+
+Методы:
+
+set items(items: HTMLElement[]): void - установка списка товаров
+
+Интерфейс IGallery:
+
+interface IGallery {
+    items: HTMLElement[];
+}
+
+#### Header 
+Назначение: Отображает шапку приложения с кнопкой корзины и счетчиком товаров.
+
+Конструктор:
+
+constructor(protected events: IEvents, container: HTMLElement)
+Поля:
+
+protected counterElement: HTMLElement - элемент счетчика товаров
+
+protected basketButton: HTMLButtonElement - кнопка открытия корзины
+
+Методы:
+
+set counter(value: number): void - установка значения счетчика
+
+Интерфейс IHeader:
+
+interface IHeader {
+    counter: number;
+}
+#### Modal
+Назначение: Управляет отображением модальных окон.
+
+Конструктор:
+
+constructor(protected events: IEvents, protected container: HTMLElement)
+Поля:
+
+protected _content: HTMLElement - контейнер содержимого
+
+protected modalCloseButton: HTMLButtonElement - кнопка закрытия
+
+protected _isOpen: boolean - флаг открытия/закрытия
+
+Методы:
+
+set content(value: HTMLElement): void - установка содержимого
+
+set isOpen(value: boolean): void - открытие/закрытие модального окна
+
+Интерфейс IModal:
+
+interface IModal {
+  content: HTMLElement;
+}
+
+#### OrderModalSuccess 
+Назначение: Отображает сообщение об успешном оформлении заказа.
+
+Конструктор:
+
+constructor(protected events: IEvents, container: HTMLElement)
+Поля:
+
+protected titleElement: HTMLElement - элемент заголовка
+
+protected descriptionElement: HTMLElement - элемент описания
+
+protected closeButton: HTMLButtonElement - кнопка закрытия
+
+Методы:
+
+set total(value: number): void - установка общей суммы заказа
+
+Интерфейс IOrderSuccess:
+
+interface IOrderSuccess {
+    total: number;
+}
