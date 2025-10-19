@@ -2,7 +2,9 @@ import { ensureElement } from "../../utils/utils";
 import { Card, ICardActions } from "./card";
 
 interface ICardBusket {
-    index:HTMLElement;
+    title: string;
+    price: string | number | null;
+    index:number;
 }
 
 export class CardBasket extends Card<ICardBusket> {

@@ -5,6 +5,7 @@ import { IEvents } from "../base/Events";
 interface IBasket {
   items: HTMLElement[];
   total: number;
+  disabled: boolean;
 }
 
 export class Basket extends Component<IBasket> {

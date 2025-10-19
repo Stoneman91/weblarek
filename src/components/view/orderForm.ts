@@ -7,8 +7,6 @@ export class OrderForm extends Form {
   protected cardButton: HTMLButtonElement;
   protected cashButton: HTMLButtonElement;
   protected addressInput: HTMLInputElement;
-  private _payment: string = '';
-  private _address: string = '';
 
   constructor(events: IEvents, container: HTMLElement, private buyer: Buyer) {
     super(events, container, "order");
@@ -17,26 +15,45 @@ export class OrderForm extends Form {
     this.cashButton = ensureElement<HTMLButtonElement>('button[name="cash"]', this.container);
     this.addressInput = ensureElement<HTMLInputElement>('input[name="address"]', this.container);
 
-    this.cardButton.addEventListener("click", () => {
-      this._payment = "card";
-      this.cardButton.classList.add("button_alt-active");
-      this.cashButton.classList.remove("button_alt-active");
+  this.cardButton.addEventListener("click", () => {
       this.buyer.setData({ payment: "card" });
-      this.valid = this._payment !== '' && this._address.trim() !== '';
     });
 
-    this.cashButton.addEventListener("click", () => {
-      this._payment = "cash";
-      this.cardButton.classList.remove("button_alt-active");
-      this.cashButton.classList.add("button_alt-active");
+
+     this.cashButton.addEventListener("click", () => {
       this.buyer.setData({ payment: "cash" });
-      this.valid = this._payment !== '' && this._address.trim() !== '';
     });
 
-    this.addressInput.addEventListener("input", () => {
-      this._address = this.addressInput.value;
+      this.addressInput.addEventListener("input", () => {
       this.buyer.setData({ address: this.addressInput.value });
-      this.valid = this._payment !== '' && this._address.trim() !== '';
     });
+
+  events.on('BuyerData:changed', () => {
+      this.updateFormState();
+    });
+  }
+
+  private updateFormState(): void {
+    const data = this.buyer.getData();
+    const errors = this.buyer.validate();
+
+    this.cardButton.classList.toggle("button_alt-active", data.payment === "card");
+    this.cashButton.classList.toggle("button_alt-active", data.payment === "cash");
+
+    if (data.address) {
+      this.addressInput.value = data.address;
+    }
+
+    const orderErrors: string[] = [];
+    if (errors.payment) orderErrors.push(errors.payment);
+    if (errors.address) orderErrors.push(errors.address);
+
+    this.errors = orderErrors.join(', ');
+    this.valid = orderErrors.length === 0;
+  }
+
+    set address(value: string) {
+    this.addressInput.value = value;
+    this.buyer.setData({ address: value });
   }
 }

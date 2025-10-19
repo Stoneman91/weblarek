@@ -7,7 +7,7 @@ import { cloneTemplate, ensureElement } from "./utils/utils";
 import { Gallery } from "./components/view/gallery";
 import { EventEmitter } from "./components/base/Events";
 import { Modal } from "./components/view/modal";
-import { IProduct } from "./types";
+import { IProduct, TPayment } from "./types";
 import { CardPreview } from "./components/view/cardPreview";
 import { Basket } from "./components/view/basket";
 import { Cart } from "./components/Models/Cart";
@@ -26,45 +26,59 @@ const modal = new Modal(events, ensureElement("#modal-container"));
 const header = new Header(events, ensureElement(".header"));
 const cart = new Cart(events);
 const buyer = new Buyer(events);
+const basket = new Basket(events, cloneTemplate(ensureElement<HTMLTemplateElement>('#basket')));
+const orderForm = new OrderForm(events, cloneTemplate(ensureElement<HTMLTemplateElement>('#order')), buyer);
+const contactsForm = new ContactsForm(events, cloneTemplate(ensureElement<HTMLTemplateElement>('#contacts')), buyer);
+const orderSuccess = new OrderModalSuccess(events, cloneTemplate(ensureElement<HTMLTemplateElement>('#success')));
+
 
 events.on("cart:changed", () => {
   header.counter = cart.getItemsCount();
 });
 
 events.on('basket:open', () => {
-  const basket = new Basket(events, cloneTemplate(ensureElement<HTMLTemplateElement>('#basket')));
   const items = cart.getItems();
   
   if (items.length === 0) {
-    basket.items = [];
-    basket.total = 0;
-    basket.disabled = true;
+    basket.render({
+      items: [],
+      total: 0,
+      disabled: true
+    });
   } else {
-    basket.items = items.map((item, index) => {
-      const cardBasket = new CardBasket(cloneTemplate(ensureElement<HTMLTemplateElement>('#card-basket')), {
-        onClick: () => {
-          cart.removeItem(item.id);
-          events.emit('basket:open');
+    const basketItems = items.map((item, index) => {
+      const cardBasket = new CardBasket(
+        cloneTemplate(ensureElement<HTMLTemplateElement>('#card-basket')), 
+        {
+          onClick: () => events.emit('basket:remove', item)
         }
+      );
+      
+      return cardBasket.render({
+        title: item.title,
+        price: item.price || 0,
+        index: index + 1
       });
-      
-      cardBasket.title = item.title;
-      cardBasket.price = item.price || 0;
-      cardBasket.index = index + 1;
-      
-      return cardBasket.render();
     });
     
-    basket.total = cart.getTotalPrice();
-    basket.disabled = false;
+    basket.render({
+      items: basketItems,
+      total: cart.getTotalPrice(),
+      disabled: false
+    });
   }
   
-  modal.content = basket.render();;
+  modal.content = basket.render();
   modal.isOpen = true;
 });
 events.on("modal:close", () => {
   modal.isOpen = false;
 });
+
+events.on('basket:remove', (item: IProduct) => {
+  cart.removeItem(item.id);
+});
+
 
 events.on("products:changed", () => {
   gallery.render({ 
@@ -89,8 +103,8 @@ events.on("selectedProduct:changed", () => {
       {
         onClick: () => {
           if (cart.isProductInCart(selectedProduct.id)) {
-            cart.removeItem(selectedProduct.id);
-             modal.isOpen = false;
+            events.emit("basket:remove", selectedProduct);
+            modal.isOpen = false;
           } else {
             events.emit("product:addToCart", selectedProduct);
           }
@@ -113,19 +127,19 @@ events.on("selectedProduct:changed", () => {
   }
 });
 
+
+
 events.on("product:addToCart", (item: IProduct) => {
   cart.addItem(item);
   modal.isOpen = false;
 });
 
 events.on("basket:order", () => {
-  const orderForm = new OrderForm(events, cloneTemplate(ensureElement<HTMLTemplateElement>('#order')), buyer);
   modal.content = orderForm.render();
   modal.isOpen = true;
 });
 
 events.on("order:submit", () => {
-  const contactsForm = new ContactsForm(events, cloneTemplate(ensureElement<HTMLTemplateElement>('#contacts')), buyer);
   modal.content = contactsForm.render();
   modal.isOpen = true;
 });
@@ -138,14 +152,11 @@ events.on("contacts:submit", () => {
     total: cart.getTotalPrice()
   };
 
-  apiClient.createOrder(orderData)
+ apiClient.createOrder(orderData)
     .then(() => {
-      const successTemplate = ensureElement<HTMLTemplateElement>('#success');
-      const successElement = cloneTemplate<HTMLElement>(successTemplate);
-      const success = new OrderModalSuccess(events, successElement);
-      
-      success.total = cart.getTotalPrice();
-      modal.content = successElement;
+      modal.content = orderSuccess.render({
+        total: cart.getTotalPrice()
+      });
       
       cart.clear();
       buyer.clear();
@@ -158,6 +169,26 @@ events.on("contacts:submit", () => {
 events.on("orderSuccess:close", () => {
   modal.isOpen = false;
   header.counter = 0;
+});
+
+events.on("order:payment", (data: { payment: TPayment }) => {
+  buyer.setData({ payment: data.payment });
+});
+
+events.on("order:address", (data: { address: string }) => {
+  buyer.setData({ address: data.address });
+});
+
+events.on("contacts:email", (data: { email: string }) => {
+  buyer.setData({ email: data.email });
+});
+
+events.on("contacts:phone", (data: { phone: string }) => {
+  buyer.setData({ phone: data.phone });
+});
+
+events.on('BuyerData:changed', () => {
+  console.log('Данные покупателя обновлены:', buyer.getData());
 });
 
 apiClient.getProducts()
